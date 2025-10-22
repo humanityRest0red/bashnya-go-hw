@@ -5,7 +5,11 @@ import "fmt"
 func main() {
 	left, right, op := Input()
 	result := Calc(left, right, op)
-	fmt.Printf("%.3f", result)
+	if op == "/" {
+		fmt.Printf("%.3f", result)
+	} else {
+		fmt.Print(result)
+	}
 }
 
 func Input() (float64, float64, string) {
@@ -21,7 +25,7 @@ func Input() (float64, float64, string) {
 
 	fmt.Println("Input operation:")
 	_, err = fmt.Scan(&op)
-	for err != nil || !IsValidOp(op) {
+	for err != nil || !IsOpValid(op) {
 		if err != nil {
 			fmt.Println("Error string input")
 		} else {
@@ -33,18 +37,18 @@ func Input() (float64, float64, string) {
 	fmt.Println("Input right operand:")
 	_, err = fmt.Scan(&right)
 	for err != nil {
-		fmt.Println(err)
+		fmt.Println("Error float number, try again")
 		_, err = fmt.Scan(&right)
 	}
 	return left, right, op
 }
 
-func IsValidOp(op string) bool {
+func IsOpValid(op string) bool {
 	return op == "+" || op == "-" || op == "*" || op == "/"
 }
 
 func Calc(left, right float64, op string) float64 {
-	var result float64 = 0
+	var result float64
 	switch op {
 	case "+":
 		result = left + right
