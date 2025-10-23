@@ -7,14 +7,14 @@ const MAX = 12307
 func main() {
 	var num, res int
 
+	fmt.Println("Введите число:")
 	_, err := fmt.Scan(&num)
 	if err == nil {
 		res, err = Process(num)
 	}
 
 	if err == nil {
-		fmt.Printf("Число = %v\n", res)
-		fmt.Printf("В текстовом виде:\n%v\n", NumIntoWords(res))
+		fmt.Printf("Результат: %v - %v\n", res, NumIntoWords(res))
 	} else {
 		fmt.Print(err)
 	}
@@ -22,7 +22,6 @@ func main() {
 
 func Process(num int) (int, error) {
 	for num < MAX {
-		fmt.Println(num)
 		if num < 0 {
 			num = -num
 		}
@@ -47,21 +46,31 @@ func Process(num int) (int, error) {
 }
 
 func NumIntoWords(num int) string {
-	thousands := num / 1000
-	var result string = HundredsIntoWords(thousands, 'f')
-	switch thousands % 10 {
-	case 1:
-		result += " тысяча"
-	case 2, 3, 4:
-		result += " тысячи"
-	default:
-		result += " тысяч"
-	}
+	milliards := num / 1_000_000_000
+	remainder := num % 1_000_000_000
+	millions := remainder / 1_000_000
+	remainder = remainder % 1_000_000
+	thousands := remainder / 1_000
 
-	tail := HundredsIntoWords(num, 'm')
-	if tail != "" {
-		result += " " + tail
+	var result string
+
+	tail := HundredsIntoWords(milliards, 'm')
+	tail = ConcatWord(tail, "миллиард", 'm', milliards)
+	result = ConcatTail(result, tail)
+
+	tail = HundredsIntoWords(millions, 'm')
+	tail = ConcatWord(tail, "миллион", 'm', millions)
+	result = ConcatTail(result, tail)
+
+	tail = HundredsIntoWords(thousands, 'f')
+	if millions == 500 {
+		fmt.Print(millions, thousands)
 	}
+	tail = ConcatWord(tail, "тысяч", 'f', thousands)
+	result = ConcatTail(result, tail)
+
+	tail = HundredsIntoWords(num, 'm')
+	result = ConcatTail(result, tail)
 
 	return CapitalizeFirstLetter(result)
 }
@@ -101,9 +110,48 @@ func HundredsIntoWords(num int, gender rune) string {
 	return result
 }
 
+func ConcatWord(s, word string, gender rune, num int) string {
+	if num > 0 {
+		s += " " + word
+		if 10 <= num && num <= 20 {
+			if gender == 'm' {
+				s += "ов"
+			}
+		} else {
+			switch num % 10 {
+			case 1:
+				if gender == 'f' {
+					s += "а"
+				}
+			case 2, 3, 4:
+				if gender == 'f' {
+					s += "и"
+				} else {
+					s += "а"
+				}
+			default:
+				if gender == 'm' {
+					s += "ов"
+				}
+			}
+		}
+	}
+	return s
+}
+
 func AddSpaceIfNeed(s string) string {
 	if s != "" {
 		return s + " "
+	}
+	return s
+}
+
+func ConcatTail(s, tail string) string {
+	if tail != "" {
+		if s != "" {
+			s += " "
+		}
+		s += tail
 	}
 	return s
 }
