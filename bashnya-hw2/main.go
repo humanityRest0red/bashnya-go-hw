@@ -63,9 +63,6 @@ func NumIntoWords(num int) string {
 	result = ConcatTail(result, tail)
 
 	tail = HundredsIntoWords(thousands, 'f')
-	if millions == 500 {
-		fmt.Print(millions, thousands)
-	}
 	tail = ConcatWord(tail, "тысяч", 'f', thousands)
 	result = ConcatTail(result, tail)
 
