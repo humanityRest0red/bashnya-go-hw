@@ -1,14 +1,14 @@
-package stack
+package deque
 
 import "testing"
 
-func stackEqSlice[T comparable](stack *Stack[T], slice []T) bool {
+func stackEqSlice[T comparable](stack *Deque[T], slice []T) bool {
 	if uint(len(slice)) != stack.Size() {
 		return false
 	}
 
 	for _, v := range slice {
-		elem, _ := stack.Pop()
+		elem, _ := stack.PopBack()
 		if v != elem {
 			return false
 		}
@@ -17,7 +17,7 @@ func stackEqSlice[T comparable](stack *Stack[T], slice []T) bool {
 	return true
 }
 
-func TestStackPush_Table(t *testing.T) {
+func TestDequePushBack_Table(t *testing.T) {
 	tests := []struct {
 		tc_name  string
 		elem     int
@@ -32,10 +32,10 @@ func TestStackPush_Table(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.tc_name, func(t *testing.T) {
-			s := Stack[int]{}
-			s.Push(tc.elem)
-			if !stackEqSlice(&s, tc.expected) {
-				t.Errorf("Expected %v, but got %v", tc.expected, s)
+			d := Deque[int]{}
+			d.PushBack(tc.elem)
+			if !stackEqSlice(&d, tc.expected) {
+				t.Errorf("Expected %v, but got %v", tc.expected, d)
 			}
 		})
 	}
