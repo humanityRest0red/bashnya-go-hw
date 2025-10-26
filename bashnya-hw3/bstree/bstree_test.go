@@ -1,0 +1,174 @@
+package bstree
+
+import "testing"
+
+// func stackEqSlice[T comparable](stack *Deque[T], slice []T) bool {
+// 	if uint(len(slice)) != stack.Size() {
+// 		return false
+// 	}
+
+// 	for _, v := range slice {
+// 		elem, _ := stack.PopBack()
+// 		if v != elem {
+// 			return false
+// 		}
+// 	}
+
+// 	return true
+// }
+
+// func TestBSTreeInsert_Table(t *testing.T) {
+// 	tests := []struct {
+// 		tc_name  string
+// 		elem     int
+// 		expected bool
+// 	}{
+// 		{
+// 			tc_name:  "Valid",
+// 			elem:     -1,
+// 			expected: true,
+// 		},
+// 	}
+
+// 	for _, tc := range tests {
+// 		t.Run(tc.tc_name, func(t *testing.T) {
+// 			b := BSTree[int]{}
+// 			b.Insert(tc.elem)
+// 			if b.Find(tc.elem) != tc.expected {
+// 				t.Errorf("Expected %v contains %v", b, tc.elem)
+// 			}
+// 		})
+// 	}
+// }
+
+// func TestBSTreeRemove_Table(t *testing.T) {
+// 	tests := []struct {
+// 		tc_name  string
+// 		elem     int
+// 		expected bool
+// 	}{
+// 		{
+// 			tc_name:  "Valid",
+// 			elem:     -1,
+// 			expected: true,
+// 		},
+// 	}
+
+// 	for _, tc := range tests {
+// 		t.Run(tc.tc_name, func(t *testing.T) {
+// 			b := BSTree[int]{}
+// 			b.Remove(tc.elem)
+// 			if b.Find(tc.elem) != tc.expected {
+// 				t.Errorf("Expected %v contains %v", b, tc.elem)
+// 			}
+// 		})
+// 	}
+// }
+
+func TestBSTreeFind_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		b        *BSTree[int]
+		elem     int
+		expected bool
+	}{
+		{
+			tc_name:  "Empty",
+			b:        &BSTree[int]{},
+			elem:     42,
+			expected: false,
+		},
+		{
+			tc_name:  "Size = 1 and contains",
+			b:        New(42),
+			elem:     42,
+			expected: true,
+		},
+		{
+			tc_name:  "Size = 1 and not contains",
+			b:        New(412),
+			elem:     42,
+			expected: false,
+		},
+		{
+			tc_name:  "Not contains",
+			b:        New(1, 2, 3, 4, 6, 7),
+			elem:     5,
+			expected: false,
+		},
+		{
+			tc_name:  "Contains",
+			b:        New(1, 2, 3, 4, 6, 7),
+			elem:     6,
+			expected: true,
+		},
+		{
+			tc_name:  "WTF",
+			b:        New(7, 7, 7, 7, 7, 7, 7, 7, 7),
+			elem:     7,
+			expected: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			result := tc.b.Find(tc.elem)
+			if result != tc.expected {
+				t.Errorf("Expected %v, but got %v", tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestBSTreeDepth_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		b        *BSTree[int]
+		expected uint
+	}{
+		{
+			tc_name:  "Empty",
+			b:        &BSTree[int]{},
+			expected: 0,
+		},
+		{
+			tc_name:  "1 elem",
+			b:        New(42),
+			expected: 1,
+		},
+		{
+			tc_name:  "2 elems",
+			b:        New(42, 41),
+			expected: 2,
+		},
+		{
+			tc_name:  "3 elems but Depth is 2",
+			b:        New(42, 41, 43),
+			expected: 2,
+		},
+		{
+			tc_name:  "BST as a List",
+			b:        New(1, 2, 3, 4, 5),
+			expected: 5,
+		},
+		{
+			tc_name:  "BST as a List reversed",
+			b:        New(100, 10, 1, 0),
+			expected: 4,
+		},
+		{
+			tc_name:  "Almost List",
+			b:        New(1, 2, 3, 4, 0),
+			expected: 4,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			result := tc.b.Depth()
+			if result != tc.expected {
+				t.Errorf("Expected %v, but got %v", tc.expected, result)
+			}
+		})
+	}
+}
