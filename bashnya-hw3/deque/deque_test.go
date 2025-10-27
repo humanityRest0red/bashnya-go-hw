@@ -285,8 +285,69 @@ func TestDequeClear_Table(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.tc_name, func(t *testing.T) {
 			tc.s.Clear()
-			if tc.expected != tc.s {
+			if !tc.s.Eq(tc.expected) {
 				t.Errorf("Expected %v, but got %v", tc.expected, tc.s)
+			}
+		})
+	}
+}
+
+func TestDequeEq_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		d1       *Deque[rune]
+		d2       *Deque[rune]
+		expected bool
+	}{
+		{
+			tc_name:  "Empty",
+			d1:       New[rune](),
+			d2:       New[rune](),
+			expected: true,
+		},
+		{
+			tc_name:  "1 elem, Eq",
+			d1:       New('q'),
+			d2:       New('q'),
+			expected: true,
+		},
+		{
+			tc_name:  "1 elem, Not Eq",
+			d1:       New('q'),
+			d2:       New('w'),
+			expected: false,
+		},
+		{
+			tc_name:  "One is empty and other is not",
+			d1:       New('h', 'e', 'l', 'l'),
+			d2:       New[rune](),
+			expected: false,
+		},
+		{
+			tc_name:  "Len is eq, but elems are not",
+			d1:       New('h', 'e', 'l', 'l'),
+			d2:       New('w', 'o', 'r', 'd'),
+			expected: false,
+		},
+		{
+			tc_name:  "Are almost equal",
+			d1:       New('h', 'e', 'l', 'l'),
+			d2:       New('h', 'e', 'l', 'l', 'o'),
+			expected: false,
+		},
+		{
+			tc_name:  "Are Equal",
+			d1:       New('h', 'e', 'l', 'l', 'o'),
+			d2:       New('h', 'e', 'l', 'l', 'o'),
+			expected: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			result := tc.d1.Eq(tc.d2)
+			if result != tc.expected {
+				t.Errorf("Expected %v, but got %v", tc.expected, result)
 			}
 		})
 	}
