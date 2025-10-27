@@ -4,11 +4,11 @@ import "errors"
 
 var ErrEmptyStack = errors.New("empty stack")
 
-type Stack[T any] struct {
+type Stack[T comparable] struct {
 	data []T
 }
 
-func New[T any](elements ...T) *Stack[T] {
+func New[T comparable](elements ...T) *Stack[T] {
 	return &Stack[T]{
 		data: elements,
 	}
@@ -50,4 +50,17 @@ func (s *Stack[T]) IsEmpty() bool {
 
 func (s *Stack[T]) Clear() {
 	s.data = s.data[:0]
+}
+
+func (a *Stack[T]) Eq(b *Stack[T]) bool {
+	if a.Size() != b.Size() {
+		return false
+	}
+
+	for i := range a.Size() {
+		if a.data[i] != b.data[i] {
+			return false
+		}
+	}
+	return true
 }

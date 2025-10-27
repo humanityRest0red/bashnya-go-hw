@@ -2,6 +2,7 @@ package main
 
 import (
 	"bstree"
+	"fmt"
 )
 
 // func main() {
@@ -22,9 +23,20 @@ import (
 // 	println(d.PopFront())
 // }
 
+// func main() {
+// 	b := bstree.New(2, 3)
+// 	for v := range b.Iterator() {
+// 		print(v)
+// 	}
+// }
+
 func main() {
-	b := bstree.New(2, 3)
-	for v := range b.Iterator() {
-		print(v)
-	}
+	bb := bstree.New(1, 2, 3)
+	// bb := bstree.BSTree[int]{}
+	test(*bb)
+	fmt.Printf("%p\n", &bb)
+}
+
+func test(b bstree.BSTree[int]) {
+	fmt.Printf("%p\n", &b)
 }

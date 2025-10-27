@@ -2,94 +2,140 @@ package stack
 
 import "testing"
 
-func stackEqSlice[T comparable](stack *Stack[T], slice []T) bool {
-	if uint(len(slice)) != stack.Size() {
-		return false
-	}
-
-	for _, v := range slice {
-		elem, _ := stack.Pop()
-		if v != elem {
-			return false
-		}
-	}
-
-	return true
-}
-
 func TestStackPush_Table(t *testing.T) {
 	tests := []struct {
 		tc_name  string
+		s        *Stack[int]
 		elem     int
-		expected []int
+		expected *Stack[int]
 	}{
 		{
-			tc_name:  "Valid input",
+			tc_name:  "Was empty",
+			s:        New[int](),
 			elem:     -1,
-			expected: []int{-1},
+			expected: New(-1),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.tc_name, func(t *testing.T) {
-			s := Stack[int]{}
-			s.Push(tc.elem)
-			if !stackEqSlice(&s, tc.expected) {
-				t.Errorf("Expected %v, but got %v", tc.expected, s)
+			tc.s.Push(tc.elem)
+			if !tc.s.Eq(tc.expected) {
+				t.Errorf("Expected %v, but got %v", tc.expected, tc.s)
 			}
 		})
 	}
 }
 
-// func TestStackPush_Table(t *testing.T) {
-// 	tests := []struct {
-// 		name     string
-// 		input    string
-// 		expected []int
-// 		is_err   bool
-// 	}{
-// 		{
-// 			name:     "Valid input",
-// 			input:    "1 2 -3 4 0",
-// 			expected: []int{1, 2, -3, 4, 0},
-// 			is_err:   false,
-// 		},
-// 		{
-// 			name:     "Invalid float input",
-// 			input:    "1 2.3",
-// 			expected: []int{},
-// 			is_err:   true,
-// 		},
-// 		{
-// 			name:     "Invalid char input",
-// 			input:    "1 2 -3 4 q",
-// 			expected: []int{},
-// 			is_err:   true,
-// 		},
-// 		{
-// 			name:     "Empty input",
-// 			input:    "",
-// 			expected: []int{},
-// 			is_err:   true,
-// 		},
-// 	}
+func TestStackPop_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		s        *Stack[int]
+		elem     int
+		expected *Stack[int]
+		err      error
+	}{
+		{
+			tc_name:  "Was empty",
+			s:        New[int](),
+			elem:     0,
+			expected: New[int](),
+			err:      ErrEmptyStack,
+		},
+		{
+			tc_name:  "Size = 1 elem",
+			s:        New(42),
+			elem:     42,
+			expected: New[int](),
+			err:      nil,
+		},
+		{
+			tc_name:  "Many elems",
+			s:        New(42, 3, 1, 0, 2, 0),
+			elem:     0,
+			expected: New(42, 3, 1, 0, 2),
+			err:      nil,
+		},
+		{
+			tc_name:  "Many elems",
+			s:        New(42, 3, 1, 0, 2, 0),
+			elem:     0,
+			expected: New(42, 3, 1, 0, 2),
+			err:      nil,
+		},
+	}
 
-// 	for _, tc := range tests {
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			r := strings.NewReader(tc.input)
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			result, err := tc.s.Pop()
 
-// 			nums, err := inputNums(r)
+			if err != tc.err {
+				t.Errorf("Expected %v, but got %v", tc.err, err)
+			}
+			if err == nil && !tc.s.Eq(tc.expected) {
+				t.Errorf("Expected %v, but got %v", tc.expected, tc.s)
+			}
+			if err == nil && tc.elem != result {
+				t.Errorf("Expected %v, but got %v", tc.elem, result)
+			}
+		})
+	}
+}
 
-// 			if (err != nil) != tc.is_err {
-// 				t.Errorf("Expected %v, but got %v", tc.is_err, err)
-// 			}
+func TestStackPeek_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		s        *Stack[int]
+		elem     int
+		expected *Stack[int]
+		err      error
+	}{
+		{
+			tc_name:  "Was empty",
+			s:        New[int](),
+			elem:     0,
+			expected: New[int](),
+			err:      ErrEmptyStack,
+		},
+		{
+			tc_name:  "Size = 1 elem",
+			s:        New(42),
+			elem:     42,
+			expected: New(42),
+			err:      nil,
+		},
+		{
+			tc_name:  "Many elems",
+			s:        New(42, 3, 1, 0, 2, 0),
+			elem:     0,
+			expected: New(42, 3, 1, 0, 2, 0),
+			err:      nil,
+		},
+		{
+			tc_name:  "Many elems",
+			s:        New(42, 3, 1, 0, 2, 0),
+			elem:     0,
+			expected: New(42, 3, 1, 0, 2, 0),
+			err:      nil,
+		},
+	}
 
-// 			if err == nil && !reflect.DeepEqual(nums, tc.expected) {
-// 				t.Errorf("Expected %v, but got %v", tc.expected, nums)
-// 			}
-// 		})
-// 	}
-// }
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			result, err := tc.s.Peek()
+
+			if err != tc.err {
+				t.Errorf("Expected %v, but got %v", tc.err, err)
+			}
+			if err == nil && !tc.s.Eq(tc.expected) {
+				t.Errorf("Expected %v, but got %v", tc.expected, tc.s)
+			}
+			if err == nil && tc.elem != result {
+				t.Errorf("Expected %v, but got %v", tc.elem, result)
+			}
+		})
+	}
+}
 
 func TestStackSize_Table(t *testing.T) {
 	tests := []struct {
@@ -99,7 +145,7 @@ func TestStackSize_Table(t *testing.T) {
 	}{
 		{
 			tc_name:  "Empty",
-			s:        &Stack[int]{},
+			s:        New[int](),
 			expected: 0,
 		},
 		{
@@ -110,13 +156,141 @@ func TestStackSize_Table(t *testing.T) {
 		{
 			tc_name:  "Many elems",
 			s:        New(1, 5, 10, -1, 1, 2, 3),
-			expected: 6,
+			expected: 7,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.tc_name, func(t *testing.T) {
 			result := tc.s.Size()
+			if result != tc.expected {
+				t.Errorf("Expected %v, but got %v", tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestStackIsEmpty_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		s        *Stack[int]
+		expected bool
+	}{
+		{
+			tc_name:  "Empty",
+			s:        New[int](),
+			expected: true,
+		},
+		{
+			tc_name:  "1 elem",
+			s:        New(1),
+			expected: false,
+		},
+		{
+			tc_name:  "Many elems",
+			s:        New(1, 5, 10, -1, 1, 2, 3),
+			expected: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			result := tc.s.IsEmpty()
+			if result != tc.expected {
+				t.Errorf("Expected %v, but got %v", tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestStackClear_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		s        *Stack[int]
+		expected bool
+	}{
+		{
+			tc_name:  "Empty",
+			s:        New[int](),
+			expected: true,
+		},
+		{
+			tc_name:  "1 elem",
+			s:        New(1),
+			expected: true,
+		},
+		{
+			tc_name:  "Many elems",
+			s:        New(1, 5, 10, -1, 1, 2, 3),
+			expected: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			tc.s.Clear()
+			result := tc.s.IsEmpty()
+			if result != tc.expected {
+				t.Errorf("Expected %v, but got %v", tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestStackEq_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		s1       *Stack[rune]
+		s2       *Stack[rune]
+		expected bool
+	}{
+		{
+			tc_name:  "Empty",
+			s1:       New[rune](),
+			s2:       New[rune](),
+			expected: true,
+		},
+		{
+			tc_name:  "1 elem, Eq",
+			s1:       New('q'),
+			s2:       New('q'),
+			expected: true,
+		},
+		{
+			tc_name:  "1 elem, Not Eq",
+			s1:       New('q'),
+			s2:       New('w'),
+			expected: false,
+		},
+		{
+			tc_name:  "One is empty and other is not",
+			s1:       New('h', 'e', 'l', 'l'),
+			s2:       New[rune](),
+			expected: false,
+		},
+		{
+			tc_name:  "Len is eq, but elems are not",
+			s1:       New('h', 'e', 'l', 'l'),
+			s2:       New('w', 'o', 'r', 'd'),
+			expected: false,
+		},
+		{
+			tc_name:  "Are almost equal",
+			s1:       New('h', 'e', 'l', 'l'),
+			s2:       New('h', 'e', 'l', 'l', 'o'),
+			expected: false,
+		},
+		{
+			tc_name:  "Are Equal",
+			s1:       New('h', 'e', 'l', 'l', 'o'),
+			s2:       New('h', 'e', 'l', 'l', 'o'),
+			expected: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			result := tc.s1.Eq(tc.s2)
 			if result != tc.expected {
 				t.Errorf("Expected %v, but got %v", tc.expected, result)
 			}
