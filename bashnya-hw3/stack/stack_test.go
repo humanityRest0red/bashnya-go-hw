@@ -90,3 +90,36 @@ func TestStackPush_Table(t *testing.T) {
 // 		})
 // 	}
 // }
+
+func TestStackSize_Table(t *testing.T) {
+	tests := []struct {
+		tc_name  string
+		s        *Stack[int]
+		expected uint
+	}{
+		{
+			tc_name:  "Empty",
+			s:        &Stack[int]{},
+			expected: 0,
+		},
+		{
+			tc_name:  "1 elem",
+			s:        New(1),
+			expected: 1,
+		},
+		{
+			tc_name:  "Many elems",
+			s:        New(1, 5, 10, -1, 1, 2, 3),
+			expected: 6,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.tc_name, func(t *testing.T) {
+			result := tc.s.Size()
+			if result != tc.expected {
+				t.Errorf("Expected %v, but got %v", tc.expected, result)
+			}
+		})
+	}
+}
