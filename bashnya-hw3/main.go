@@ -1,10 +1,5 @@
 package main
 
-import (
-	"bstree"
-	"fmt"
-)
-
 // func main() {
 // 	s := stack.New(1.3, 2.3, -3.14)
 // 	// for i := range 10 {
@@ -30,13 +25,24 @@ import (
 // 	}
 // }
 
-func main() {
-	bb := bstree.New(1, 2, 3)
-	// bb := bstree.BSTree[int]{}
-	test(*bb)
-	fmt.Printf("%p\n", &bb)
-}
+// type Speaker interface {
+// 	Speak() string
+// }
 
-func test(b bstree.BSTree[int]) {
-	fmt.Printf("%p\n", &b)
-}
+// type Dog struct{}
+
+// func (Dog) Speak() string {
+// 	return "woof"
+// }
+
+// type Cat struct{}
+
+// func main() {
+// 	animals := []Speaker{Dog{}, Cat{}}
+// 	for _, v := range animals {
+// 		fmt.Println(v)
+// 	}
+// }
+
+// type any interface {
+// }

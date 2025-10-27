@@ -4,11 +4,11 @@ import "errors"
 
 var ErrEmptyDeque = errors.New("empty deque")
 
-type Deque[T any] struct {
+type Deque[T comparable] struct {
 	data []T
 }
 
-func New[T any](elements ...T) *Deque[T] {
+func New[T comparable](elements ...T) *Deque[T] {
 	return &Deque[T]{
 		data: elements,
 	}
@@ -62,4 +62,17 @@ func (d *Deque[T]) Size() uint {
 
 func (d *Deque[T]) Clear() {
 	d.data = d.data[:0]
+}
+
+func (a *Deque[T]) Eq(b *Deque[T]) bool {
+	if a.Size() != b.Size() {
+		return false
+	}
+
+	for i := range a.Size() {
+		if a.data[i] != b.data[i] {
+			return false
+		}
+	}
+	return true
 }

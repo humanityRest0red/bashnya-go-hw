@@ -2,91 +2,27 @@ package deque
 
 import "testing"
 
-func stackEqSlice[T comparable](stack *Deque[T], slice []T) bool {
-	if uint(len(slice)) != stack.Size() {
-		return false
-	}
-
-	for _, v := range slice {
-		elem, _ := stack.PopBack()
-		if v != elem {
-			return false
-		}
-	}
-
-	return true
-}
-
 func TestDequePushBack_Table(t *testing.T) {
 	tests := []struct {
 		tc_name  string
+		s        *Deque[int]
 		elem     int
-		expected []int
+		expected *Deque[int]
 	}{
 		{
-			tc_name:  "Valid input",
+			tc_name:  "Was empty",
+			s:        New[int](),
 			elem:     -1,
-			expected: []int{-1},
+			expected: New(-1),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.tc_name, func(t *testing.T) {
-			d := Deque[int]{}
-			d.PushBack(tc.elem)
-			if !stackEqSlice(&d, tc.expected) {
-				t.Errorf("Expected %v, but got %v", tc.expected, d)
+			tc.s.PushBack(tc.elem)
+			if !tc.s.Eq(tc.expected) {
+				t.Errorf("Expected %v, but got %v", tc.expected, tc.s)
 			}
 		})
 	}
 }
-
-// func TestStackPush_Table(t *testing.T) {
-// 	tests := []struct {
-// 		name     string
-// 		input    string
-// 		expected []int
-// 		is_err   bool
-// 	}{
-// 		{
-// 			name:     "Valid input",
-// 			input:    "1 2 -3 4 0",
-// 			expected: []int{1, 2, -3, 4, 0},
-// 			is_err:   false,
-// 		},
-// 		{
-// 			name:     "Invalid float input",
-// 			input:    "1 2.3",
-// 			expected: []int{},
-// 			is_err:   true,
-// 		},
-// 		{
-// 			name:     "Invalid char input",
-// 			input:    "1 2 -3 4 q",
-// 			expected: []int{},
-// 			is_err:   true,
-// 		},
-// 		{
-// 			name:     "Empty input",
-// 			input:    "",
-// 			expected: []int{},
-// 			is_err:   true,
-// 		},
-// 	}
-
-// 	for _, tc := range tests {
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			r := strings.NewReader(tc.input)
-
-// 			nums, err := inputNums(r)
-
-// 			if (err != nil) != tc.is_err {
-// 				t.Errorf("Expected %v, but got %v", tc.is_err, err)
-// 			}
-
-// 			if err == nil && !reflect.DeepEqual(nums, tc.expected) {
-// 				t.Errorf("Expected %v, but got %v", tc.expected, nums)
-// 			}
-// 		})
-// 	}
-// }

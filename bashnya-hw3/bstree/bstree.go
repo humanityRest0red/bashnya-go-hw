@@ -1,6 +1,9 @@
 package bstree
 
-import "cmp"
+import (
+	"cmp"
+	"time"
+)
 
 type BSTree[T cmp.Ordered] struct {
 	root *node[T]
@@ -112,6 +115,7 @@ func (b *BSTree[T]) Iterator() <-chan T {
 			} else {
 				break
 			}
+			time.Sleep(2 * time.Second)
 		}
 	}()
 
