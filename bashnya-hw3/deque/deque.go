@@ -35,7 +35,7 @@ func (d *Deque[T]) PopFront() (T, error) {
 		return zero, ErrEmptyDeque
 	}
 	elem := d.data[0]
-	d.data = d.data[:1]
+	d.data = d.data[1:]
 
 	return elem, nil
 }
