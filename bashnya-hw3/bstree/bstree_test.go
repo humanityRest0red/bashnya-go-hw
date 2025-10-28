@@ -78,6 +78,36 @@ func TestBSTreeRemove_Table(t *testing.T) {
 			elem:     2,
 			expected: New(1, 3),
 		},
+		{
+			tc_name:  "Remove elem having Left child",
+			b:        New(1, 5, 4),
+			elem:     5,
+			expected: New(1, 4),
+		},
+		{
+			tc_name:  "Remove elem having Right child",
+			b:        New(1, 4, 5),
+			elem:     4,
+			expected: New(1, 5),
+		},
+		{
+			tc_name:  "Remove elem having Both childs",
+			b:        New(10, 5, 1, 6),
+			elem:     5,
+			expected: New(1, 6, 10),
+		},
+		{
+			tc_name:  "Remove Left list",
+			b:        New(1, 5, 4),
+			elem:     4,
+			expected: New(1, 5),
+		},
+		{
+			tc_name:  "Remove Right list",
+			b:        New(1, 4, 5),
+			elem:     5,
+			expected: New(1, 4),
+		},
 	}
 
 	for _, tc := range tests {
