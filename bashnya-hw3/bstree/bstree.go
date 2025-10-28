@@ -1,9 +1,6 @@
 package bstree
 
-import (
-	"cmp"
-	"time"
-)
+import "cmp"
 
 type BSTree[T cmp.Ordered] struct {
 	root *node[T]
@@ -46,19 +43,66 @@ func (b *BSTree[T]) Insert(elem T) {
 }
 
 func (b *BSTree[T]) Remove(elem T) {
-	// current := b.root
-	// for current != nil {
-	// 	if elem < current.key {
-	// 		current = current.left
-	// 	} else if elem > current.key {
-	// 		current = current.right
-	// 	} else {
-	// 		parent := current.parent
-	// 		left := current.left
-	// 		right := current.right
+	current := b.root
+	for current != nil {
+		if elem < current.key {
+			current = current.left
+		} else if elem > current.key {
+			current = current.right
+		} else {
+			b.deleteNode(current)
+			break
+		}
+	}
+}
 
-	// 	}
-	// }
+func (b *BSTree[T]) deleteNode(node *node[T]) {
+	if node == nil {
+		return
+	}
+
+	// Случай 1: узел — лист
+	if node.left == nil && node.right == nil {
+		if node.parent == nil {
+			b.root = nil
+		} else if node == node.parent.left {
+			node.parent.left = nil
+		} else {
+			node.parent.right = nil
+		}
+		return
+	}
+
+	// Случай 2: один ребёнок
+	if node.left == nil {
+		b.transplant(node, node.right)
+	} else if node.right == nil {
+		b.transplant(node, node.left)
+	} else {
+		// Случай 3: два ребёнка
+		successor := minimum(node.right)
+		if successor.parent != node {
+			b.transplant(successor, successor.right)
+			successor.right = node.right
+			successor.right.parent = successor
+		}
+		b.transplant(node, successor)
+		successor.left = node.left
+		successor.left.parent = successor
+	}
+}
+
+func (b *BSTree[T]) transplant(u, v *node[T]) {
+	if u.parent == nil {
+		b.root = v
+	} else if u == u.parent.left {
+		u.parent.left = v
+	} else {
+		u.parent.right = v
+	}
+	if v != nil {
+		v.parent = u.parent
+	}
 }
 
 func (b *BSTree[T]) Find(elem T) bool {
@@ -92,12 +136,10 @@ func (b *BSTree[T]) Iterator() <-chan T {
 
 		current := b.root
 
-		on_left_side := false
 		if current.left != nil {
 			for current.left != nil {
 				current = current.left
 			}
-			on_left_side = true
 		}
 		for {
 			ch <- current.key
@@ -107,15 +149,12 @@ func (b *BSTree[T]) Iterator() <-chan T {
 					for current.left != nil {
 						current = current.left
 					}
-					on_left_side = true
 				}
-			} else if on_left_side && current.parent != nil {
+			} else if current.parent != nil && current == current.parent.left {
 				current = current.parent
-				on_left_side = false
 			} else {
 				break
 			}
-			time.Sleep(2 * time.Second)
 		}
 	}()
 

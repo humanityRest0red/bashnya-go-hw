@@ -72,12 +72,12 @@ func TestBSTreeRemove_Table(t *testing.T) {
 			elem:     6,
 			expected: New(1, 5, 10, 11),
 		},
-		// {
-		// 	tc_name:  "Added copy of the elem",
-		// 	b:        New(5, 11, 10),
-		// 	elem:     1,
-		// 	expected: New(1, 5, 11, 10),
-		// },
+		{
+			tc_name:  "Root remove",
+			b:        New(2, 1, 3),
+			elem:     2,
+			expected: New(1, 3),
+		},
 	}
 
 	for _, tc := range tests {

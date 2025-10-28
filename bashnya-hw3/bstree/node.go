@@ -27,3 +27,11 @@ func myUintMax(a, b uint) uint {
 		return b
 	}
 }
+
+// функция для поиска минимального узла в поддереве
+func minimum[T cmp.Ordered](node *node[T]) *node[T] {
+	for node.left != nil {
+		node = node.left
+	}
+	return node
+}
