@@ -1,7 +1,12 @@
 package main
 
-import "uniq"
+import (
+	"fmt"
+	"myunique"
+)
 
 func main() {
-	uniq.Run()
+	if err := myunique.Run(); err != nil{
+		fmt.Println(err)
+	}
 }
