@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	if err := myunique.Run(); err != nil{
+	if err := myunique.Run(); err != nil {
 		fmt.Println(err)
 	}
 }
