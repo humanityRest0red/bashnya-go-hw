@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var ErrCDUFlags = fmt.Errorf("use only one of c, d, u")
+
 type Options struct {
 	c     bool
 	d     bool
@@ -50,8 +52,9 @@ func Run() error {
 		}
 	}()
 
-	uniq_lines := uniqueLines(&options, input)
-	Output(options, uniq_lines, output)
+	lines := readLines(input)
+	result := uniqueLines(lines, options)
+	writeLines(result, output)
 
 	return nil
 }
@@ -106,13 +109,71 @@ func (options *Options) isColision() error {
 	}
 
 	if count > 1 {
-		return fmt.Errorf("use only one of c, d, u")
+		return ErrCDUFlags
 	}
 
 	return nil
 }
 
-func myStrEq(s1, s2 string, o *Options) bool {
+func readLines(file *os.File) []string {
+	lines := make([]string, 0)
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	return lines
+}
+
+func uniqueLines(lines []string, options Options) []string {
+	omap_result := omap.New[string, uint]()
+
+	for _, line := range lines {
+		exists := false
+		for it := range omap_result.Iter() {
+			if exists = myStrEq(it.Key, line, options); exists {
+				omap_result.Add(it.Key, it.Value+1)
+				break
+			}
+		}
+
+		if !exists {
+			omap_result.Add(line, 1)
+		}
+	}
+
+	result := omapToStr(*omap_result, options)
+
+	return result
+}
+
+func omapToStr(lines omap.OMap[string, uint], options Options) []string {
+	result := make([]string, 0)
+
+	for it := range lines.Iter() {
+		line := it.Key
+		count := it.Value
+		if options.d {
+			if count > 1 {
+				result = append(result, line)
+			}
+		} else if options.u {
+			if count == 1 {
+				result = append(result, line)
+			}
+		} else {
+			if options.c {
+				line = fmt.Sprintf("%v %s", count, line)
+			}
+			result = append(result, line)
+		}
+	}
+
+	return result
+}
+
+func myStrEq(s1, s2 string, o Options) bool {
 	n := int(o.s)
 	if len(s1) < n || len(s2) < n {
 		return false
@@ -130,46 +191,8 @@ func myStrEq(s1, s2 string, o *Options) bool {
 	return s1[n:] == s2[n:]
 }
 
-func uniqueLines(options *Options, file *os.File) omap.OMap[string, uint] {
-	data := omap.New[string, uint]()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		exists := false
-		for it := range data.Iter() {
-			if exists = myStrEq(it.Key, line, options); exists {
-				data.Add(it.Key, it.Value+1)
-				break
-			}
-		}
-
-		if !exists {
-			data.Add(line, 1)
-		}
-	}
-
-	return *data
-}
-
-func Output(options Options, lines omap.OMap[string, uint], file *os.File) {
-	for it := range lines.Iter() {
-		line := it.Key
-		count := it.Value
-		if options.d {
-			if count > 1 {
-				fmt.Fprintln(file, line)
-			}
-		} else if options.u {
-			if count == 1 {
-				fmt.Fprintln(file, line)
-			}
-		} else {
-			if options.c {
-				fmt.Fprint(file, count, " ")
-			}
-			fmt.Fprintln(file, line)
-		}
+func writeLines(lines []string, file *os.File) {
+	for _, line := range lines {
+		fmt.Fprintln(file, line)
 	}
 }
