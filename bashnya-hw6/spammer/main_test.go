@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"runtime"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -132,7 +134,6 @@ func TestUsersRace(t *testing.T) {
 		"итоговый результат отличается от ожидаемого")
 }
 
-/*
 // проверяем, что SelectUsers корректно обрабатывает алиасы и не повторяет одних и тех же юзеров
 func TestAlias(t *testing.T) {
 	inputData := []string{
@@ -210,6 +211,7 @@ func TestParallelPiplines(t *testing.T) {
 	assert.Equal(t, 22, cntSecond)
 }
 
+/*
 func TestTotal(t *testing.T) {
 	inputData := []string{
 		"harry.dubois@mail.ru",
