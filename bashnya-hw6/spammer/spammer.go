@@ -63,10 +63,14 @@ func SelectMessages(in, out chan any) {
 		go func(user any) {
 			defer wg.Done()
 			if userUser, ok := user.(User); ok {
-				if msgID, err := GetMessages(userUser); err == nil {
-					for _, elem := range msgID {
-						out <- elem
-					}
+				// if msgID, err := GetMessages(userUser); err == nil {
+				// 	for _, elem := range msgID {
+				// 		out <- elem
+				// 	}
+				// }
+				msgID, _ := GetMessages(userUser)
+				for _, elem := range msgID {
+					out <- elem
 				}
 			}
 		}(user)
@@ -85,9 +89,11 @@ func CheckSpam(in, out chan any) {
 		go func(msgID any) {
 			defer wg.Done()
 			if msgIDConv, ok := msgID.(MsgID); ok {
-				if msgID, err := HasSpam(msgIDConv); err == nil {
-					out <- msgID
-				}
+				// if hasSpam, err := HasSpam(msgIDConv); err == nil {
+				// 	out <- MsgData{ID: msgIDConv, HasSpam: hasSpam}
+				// }
+				hasSpam, _ := HasSpam(msgIDConv)
+				out <- MsgData{ID: msgIDConv, HasSpam: hasSpam}
 			}
 		}(msgID)
 	}
@@ -105,10 +111,11 @@ func CombineResults(in, out chan any) {
 		go func(msgData any) {
 			defer wg.Done()
 			if msgDataConv, ok := msgData.(MsgData); ok {
-				text := fmt.Sprintf("%v %d", msgDataConv.HasSpam, msgDataConv.ID)
-				fmt.Printf("test: %s\n", text)
-				out <- text
+				out <- fmt.Sprintf("%v %v", msgDataConv.HasSpam, msgDataConv.ID)
 			}
+			// msgDataConv, _ := msgData.(MsgData)
+			// out <- fmt.Sprintf("%v %v", msgDataConv.HasSpam, msgDataConv.ID)
+
 		}(msgData)
 	}
 

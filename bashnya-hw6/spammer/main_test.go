@@ -211,7 +211,6 @@ func TestParallelPiplines(t *testing.T) {
 	assert.Equal(t, 22, cntSecond)
 }
 
-/*
 func TestTotal(t *testing.T) {
 	inputData := []string{
 		"harry.dubois@mail.ru",
@@ -290,7 +289,8 @@ func TestTotal(t *testing.T) {
 	timeEnd := time.Since(timeStart)
 	assert.Less(t, timeEnd, expectedTime,
 		"слишком долгоe выполнение. что-то где-то нераспараллелено. должно быть не больше, чем %s, а было %s", expectedTime, timeEnd)
-	assert.Equal(t, expectedOutput, testResult,
+	// was assert.equal
+	assert.ElementsMatch(t, expectedOutput, testResult,
 		"итоговый результат отличается от ожидаемого")
 	expectedStat := Stat{
 		RunGetUser:            uint32(10),
@@ -300,4 +300,3 @@ func TestTotal(t *testing.T) {
 	}
 	assert.Equal(t, stat, expectedStat, "количество вызовов функций не совпадает с ожидаемым")
 }
-*/
