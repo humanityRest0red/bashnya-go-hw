@@ -54,26 +54,44 @@ func SelectUsers(in, out chan any) {
 }
 
 func SelectMessages(in, out chan any) {
-	// 	in - User
-	// 	out - MsgID
+	var numChannels = HasSpamMaxAsyncRequests
+	channels := make([]chan User, numChannels)
+
+	for i := range numChannels {
+		channels[i] = make(chan User)
+	}
+
 	var wg sync.WaitGroup
 
-	for user := range in {
+	go func() {
+		defer func() {
+			for _, ch := range channels {
+				close(ch)
+			}
+		}()
+
+		i := 0
+		for user := range in {
+			chIdx := i % numChannels
+			channels[chIdx] <- user.(User)
+			i++
+		}
+	}()
+
+	for _, ch := range channels {
 		wg.Add(1)
-		go func(user any) {
+		go func(c chan User) {
 			defer wg.Done()
-			if userUser, ok := user.(User); ok {
-				// if msgID, err := GetMessages(userUser); err == nil {
-				// 	for _, elem := range msgID {
-				// 		out <- elem
-				// 	}
-				// }
-				msgID, _ := GetMessages(userUser)
-				for _, elem := range msgID {
-					out <- elem
+			var users []User
+			for user := range c {
+				users = append(users, user)
+			}
+			if msgIDs, err := GetMessages(users...); err == nil {
+				for _, msg := range msgIDs {
+					out <- msg
 				}
 			}
-		}(user)
+		}(ch)
 	}
 
 	wg.Wait()
@@ -84,14 +102,15 @@ func CheckSpam(in, out chan any) {
 	// out - MsgData
 	var wg sync.WaitGroup
 
+	sem := make(chan struct{}, HasSpamMaxAsyncRequests)
+
 	for msgID := range in {
 		wg.Add(1)
+		sem <- struct{}{}
 		go func(msgID any) {
 			defer wg.Done()
+			defer func() { <-sem }()
 			if msgIDConv, ok := msgID.(MsgID); ok {
-				// if hasSpam, err := HasSpam(msgIDConv); err == nil {
-				// 	out <- MsgData{ID: msgIDConv, HasSpam: hasSpam}
-				// }
 				hasSpam, _ := HasSpam(msgIDConv)
 				out <- MsgData{ID: msgIDConv, HasSpam: hasSpam}
 			}
@@ -113,9 +132,6 @@ func CombineResults(in, out chan any) {
 			if msgDataConv, ok := msgData.(MsgData); ok {
 				out <- fmt.Sprintf("%v %v", msgDataConv.HasSpam, msgDataConv.ID)
 			}
-			// msgDataConv, _ := msgData.(MsgData)
-			// out <- fmt.Sprintf("%v %v", msgDataConv.HasSpam, msgDataConv.ID)
-
 		}(msgData)
 	}
 
